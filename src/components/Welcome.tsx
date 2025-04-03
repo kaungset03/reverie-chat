@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -20,7 +21,16 @@ const Welcome = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("Message sent:", input);
+    if (input.trim() === "") return;
+    invoke("get_complete_response", { message: input })
+      .then((response) => {
+        // Handle the response from the backend
+        console.log("Response:", response as string);
+      })
+      .catch((_) => {
+        // Handle any errors
+        console.error("An unexpected error occurred");
+      });
   };
 
   return (
@@ -55,10 +65,7 @@ const Welcome = () => {
                 ))}
               </SelectContent>
             </Select>
-            <Button
-              type="submit"
-              className="px-4"
-            >
+            <Button type="submit" className="px-4">
               <Send className="h-4 w-4 mr-2" />
               Send
             </Button>
