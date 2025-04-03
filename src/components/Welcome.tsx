@@ -1,26 +1,26 @@
-import { Send } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { Button } from "./ui/button";
+import { Send } from "lucide-react";
 
 const Welcome = () => {
+  const AI_MODELS = [
+    { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo" },
+    { id: "gpt-4", name: "GPT-4" },
+    { id: "gpt-4-turbo", name: "GPT-4 Turbo" },
+  ];
   const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(event.target.value);
-  };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log("Message sent:", input);
-    // navigate to the chat page with the input
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      setInput("");
-      console.log("Navigating to chat page...");
-    }, 1000); // Simulate a network request
   };
 
   return (
@@ -32,22 +32,37 @@ const Welcome = () => {
             Start a conversation by typing a message below.
           </p>
         </div>
-        <form onSubmit={handleSubmit} className="relative w-2/3 max-w-lg">
-          <Input
-            value={input}
-            onChange={handleInputChange}
+        <form
+          onSubmit={handleSubmit}
+          className="w-2/3 max-w-lg flex flex-col gap-2"
+        >
+          <Textarea
             placeholder="Type your message..."
-            className="pr-12 py-6 bg-muted/30 border-2 rounded-xl focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-0 focus-visible:border-violet-500"
-            disabled={isLoading}
+            className="min-h-[72px] max-h-[200px] resize-none bg-muted/30 border-2 rounded-xl text-base"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
           />
-          <Button
-            type="submit"
-            size="icon"
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg h-9 w-9"
-            disabled={isLoading || !input.trim()}
-          >
-            <Send className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center justify-between">
+            <Select>
+              <SelectTrigger className="w-[180px] bg-muted/30 border-2 focus:ring-violet-500 focus:border-violet-500">
+                <SelectValue placeholder="Select model" />
+              </SelectTrigger>
+              <SelectContent>
+                {AI_MODELS.map((model) => (
+                  <SelectItem key={model.id} value={model.id}>
+                    {model.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              type="submit"
+              className="px-4"
+            >
+              <Send className="h-4 w-4 mr-2" />
+              Send
+            </Button>
+          </div>
         </form>
       </div>
     </main>
