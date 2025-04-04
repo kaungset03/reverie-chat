@@ -10,8 +10,10 @@ import {
 } from "./ui/select";
 import { Button } from "./ui/button";
 import { Send } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 
 const Welcome = () => {
+  const navigate = useNavigate();
   const AI_MODELS = [
     { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo" },
     { id: "gpt-4", name: "GPT-4" },
@@ -26,6 +28,7 @@ const Welcome = () => {
       .then((response) => {
         // Handle the response from the backend
         console.log("Response:", response as string);
+        navigate({ to: "/chats/$chatId", params: { chatId: "abc123" } });
       })
       .catch((_) => {
         // Handle any errors

@@ -9,17 +9,28 @@ import {
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 
-const InputForm = () => {
+
+type InputFormProps = {
+  value: string;
+  handleOnChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  handleOnSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+}
+
+
+const InputForm = ({ value, handleOnChange, handleOnSubmit }: InputFormProps) => {
   const AI_MODELS = [
     { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo" },
     { id: "gpt-4", name: "GPT-4" },
     { id: "gpt-4-turbo", name: "GPT-4 Turbo" },
   ];
   return (
-    <form className="w-lg lg:w-3xl mx-auto flex flex-col gap-2">
+    <form className="w-lg lg:w-3xl mx-auto flex flex-col gap-2" onSubmit={handleOnSubmit}>
       <Textarea
         placeholder="Type your message..."
         className="min-h-[80px] max-h-[180px] resize-none bg-muted/30 border-2 rounded-xl text-base scrollbar-thin scrollbar-thumb-foreground scrollbar-track-background"
+        value={value}
+        onChange={handleOnChange}
+      
       />
       <div className="flex items-center justify-between">
         <Select>
