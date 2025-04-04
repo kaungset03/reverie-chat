@@ -73,7 +73,7 @@ function PostComponent() {
   return (
     <main className="flex-1 flex flex-col h-[calc(100vh-64px)]">
       <section className="flex-1 overflow-hidden">
-        <div className="w-full h-full max-h-full overflow-y-auto">
+        <div className="w-full h-full max-h-full overflow-y-auto scrollbar-thin scrollbar-thumb-foreground scrollbar-track-background">
           <div className="w-lg lg:w-3xl mx-auto flex flex-col">
             {messages.map((message) => (
               <div

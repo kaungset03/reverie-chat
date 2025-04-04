@@ -19,7 +19,7 @@ const InputForm = () => {
     <form className="w-lg lg:w-3xl mx-auto flex flex-col gap-2">
       <Textarea
         placeholder="Type your message..."
-        className="min-h-[100px] max-h-[250px] resize-none bg-muted/30 border-2 rounded-xl text-base"
+        className="min-h-[80px] max-h-[180px] resize-none bg-muted/30 border-2 rounded-xl text-base scrollbar-thin scrollbar-thumb-foreground scrollbar-track-background"
       />
       <div className="flex items-center justify-between">
         <Select>
