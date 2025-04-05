@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
+//import { invoke } from "@tauri-apps/api/core";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -10,10 +10,10 @@ import {
 } from "./ui/select";
 import { Button } from "./ui/button";
 import { Send } from "lucide-react";
-//import { useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 
 const Welcome = () => {
-  //const navigate = useNavigate();
+  const navigate = useNavigate();
   const AI_MODELS = [
     { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo" },
     { id: "gpt-4", name: "GPT-4" },
@@ -24,16 +24,17 @@ const Welcome = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (input.trim() === "") return;
-    invoke("get_complete_response", { message: input })
-      .then((response) => {
-        // Handle the response from the backend
-        console.log("Response:", response as string);
-        //navigate({ to: "/chats/$chatId", params: { chatId: "abc123" } });
-      })
-      .catch((_) => {
-        // Handle any errors
-        console.error("An unexpected error occurred");
-      });
+    navigate({ to: "/chats/$chatId", params: { chatId: "abc123" } });
+    // invoke("get_complete_response", { message: input })
+    //   .then((response) => {
+    //     // Handle the response from the backend
+    //     console.log("Response:", response as string);
+    //     //navigate({ to: "/chats/$chatId", params: { chatId: "abc123" } });
+    //   })
+    //   .catch((_) => {
+    //     // Handle any errors
+    //     console.error("An unexpected error occurred");
+    //   });
   };
 
   return (
@@ -51,7 +52,7 @@ const Welcome = () => {
         >
           <Textarea
             placeholder="Type your message..."
-            className="min-h-[72px] max-h-[200px] resize-none bg-muted/30 border-2 rounded-xl text-base"
+            className="min-h-[72px] max-h-[200px] resize-none bg-muted/30 border-2 rounded-xl text-base scrollbar-thin scrollbar-track-background scrollbar-thumb-foreground"
             value={input}
             onChange={(e) => setInput(e.target.value)}
           />

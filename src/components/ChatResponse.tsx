@@ -8,7 +8,12 @@ type ChatResponseProps = {
 const ChatResponse = ({ message }: ChatResponseProps) => {
   return (
     <div className="min-w-full prose prose-strong:text-foreground text-accent-foreground">
-      <Markdown remarkPlugins={[remarkGfm]}>{message.content}</Markdown>
+      <Markdown 
+        remarkPlugins={[remarkGfm]}
+        skipHtml={true}
+      >
+        {message.content}
+      </Markdown>
     </div>
   );
 };

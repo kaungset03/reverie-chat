@@ -27,7 +27,7 @@ const InputForm = ({ value, handleOnChange, handleOnSubmit }: InputFormProps) =>
     <form className="w-lg lg:w-3xl mx-auto flex flex-col gap-2" onSubmit={handleOnSubmit}>
       <Textarea
         placeholder="Type your message..."
-        className="min-h-[80px] max-h-[180px] px-4 resize-none bg-muted/30 border-2 rounded-lg text-base scrollbar-thin scrollbar-thumb-foreground scrollbar-track-background"
+        className="min-h-[80px] max-h-[180px] px-4 resize-none border-2 rounded-lg text-base scrollbar-thin scrollbar-track-background scrollbar-thumb-foreground"
         value={value}
         onChange={handleOnChange}
       
