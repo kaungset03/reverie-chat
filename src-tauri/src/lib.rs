@@ -1,4 +1,4 @@
-use crate::commands::{chat_with_history, get_complete_response};
+use crate::commands::{chat_with_history, chat_with_history_stream, get_complete_response};
 
 mod commands;
 
@@ -8,7 +8,8 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             get_complete_response,
-            chat_with_history
+            chat_with_history,
+            chat_with_history_stream
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
