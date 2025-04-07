@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ChangeEvent, FormEvent, useRef, useState } from "react";
-import { Channel, invoke } from "@tauri-apps/api/core";
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import InputForm from "@/components/InputForm";
 import ChatResponse from "@/components/ChatResponse";
 
@@ -9,9 +9,10 @@ export const Route = createFileRoute("/chats/$chatId")({
 });
 
 function PostComponent() {
+  const { chatId } = Route.useParams();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const [messages, setMessages] = useState<ChatMessage[] | []>([]);
+  const [messages, setMessages] = useState<Message[] | []>([]);
   const [input, setInput] = useState<string>("");
 
   const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -20,50 +21,70 @@ function PostComponent() {
 
   const handleInputSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const newPrompt: ChatMessage = { role: "user", content: input };
-    const updatedMessages = [...messages, newPrompt];
-    setMessages(updatedMessages); 
-    setInput("");
-
-    const onEvent = new Channel<string>();
-    onEvent.onmessage = (message) => {
-      // add message to the last message of messages
-      setMessages((prev) => {
-        const updated = [...prev];
-        // check if the last message is assistant or not
-        const lastMessage = updated[updated.length - 1];
-        if (lastMessage && lastMessage.role === "assistant") {
-          // append chunk of message to content
-          updated[updated.length - 1] = {
-            ...lastMessage,
-            content: lastMessage.content + message,
-          };
-        } else {
-          // add new message
-          updated.push({
-            role: "assistant",
-            content: message,
-          });
-        }
-
-        return updated;
-      });
-
-      if (scrollRef.current) {
-        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-      }
-    };
-
-    invoke("chat_with_history_stream", {
-      messages: updatedMessages,
-      stream: onEvent,
-    }).then(() => {
-      console.log("Stream finished");
-    }).catch((e) => {
-      console.log("Error: ", e);
-    });
+    console.log("submit");
   };
 
+  // const handleInputSubmit = (e: FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   const newPrompt: Message = { role: "user", content: input };
+  //   const updatedMessages = [...messages, newPrompt];
+  //   setMessages(updatedMessages);
+  //   setInput("");
+
+  //   const onEvent = new Channel<string>();
+  //   onEvent.onmessage = (message) => {
+  //     // add message to the last message of messages
+  //     setMessages((prev) => {
+  //       const updated = [...prev];
+  //       // check if the last message is assistant or not
+  //       const lastMessage = updated[updated.length - 1];
+  //       if (lastMessage && lastMessage.role === "assistant") {
+  //         // append chunk of message to content
+  //         updated[updated.length - 1] = {
+  //           ...lastMessage,
+  //           content: lastMessage.content + message,
+  //         };
+  //       } else {
+  //         // add new message
+  //         updated.push({
+  //           role: "assistant",
+  //           content: message,
+  //         });
+  //       }
+
+  //       return updated;
+  //     });
+
+  //     if (scrollRef.current) {
+  //       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  //     }
+  //   };
+
+  //   invoke("chat_with_history_stream", {
+  //     messages: updatedMessages,
+  //     stream: onEvent,
+  //   }).then(() => {
+  //     console.log("Stream finished");
+  //   }).catch((e) => {
+  //     console.log("Error: ", e);
+  //   });
+  // };
+
+  useEffect(() => {
+    const getMessages = async () => {
+      invoke("get_chat_messages", {
+        id: chatId,
+      })
+        .then((res) => {
+          setMessages(res as Message[]);
+          console.log("Messages: ", res);
+        })
+        .catch((e) => {
+          console.log("Error: ", e);
+        });
+    };
+    getMessages();
+  }, [chatId]);
 
   return (
     <main className="flex-1 flex flex-col h-[calc(100vh-64px)]">

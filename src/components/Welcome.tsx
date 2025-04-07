@@ -11,6 +11,7 @@ import {
 import { Button } from "./ui/button";
 import { Send } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
+import { invoke } from "@tauri-apps/api/core";
 
 const Welcome = () => {
   const navigate = useNavigate();
@@ -24,7 +25,19 @@ const Welcome = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (input.trim() === "") return;
-    navigate({ to: "/chats/$chatId", params: { chatId: "abc123" } });
+    invoke("create_new_chat", {
+      message: input,
+    })
+      .then((res) => {
+        console.log(res);
+        // navigate({ to: "/chats/$chatId", params: { chatId: "abc123" } });
+        // Handle the response from the backend
+        // console.log("Response:", res as string);
+        navigate({ to: "/chats/$chatId", params: { chatId: res as string } });
+      })
+      .catch((err) => {
+        console.error(err);
+      });
     // invoke("get_complete_response", { message: input })
     //   .then((response) => {
     //     // Handle the response from the backend
