@@ -1,18 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
+import { ChangeEvent, FormEvent, useRef, useState } from "react";
 import InputForm from "@/components/InputForm";
 import ChatResponse from "@/components/ChatResponse";
+import messagesByChatIdQueryOptions from "../../features/getAllMessagesByChatQuery";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/chats/$chatId")({
   component: PostComponent,
+  loader: ({ context: { queryClient }, params: { chatId } }) =>
+    queryClient.ensureQueryData(messagesByChatIdQueryOptions(chatId)),
+  pendingComponent: () => <p>Loading..</p>,
 });
 
 function PostComponent() {
   const { chatId } = Route.useParams();
+  const { data: messages } = useSuspenseQuery(
+    messagesByChatIdQueryOptions(chatId)
+  );
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const [messages, setMessages] = useState<Message[] | []>([]);
   const [input, setInput] = useState<string>("");
 
   const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -69,22 +76,6 @@ function PostComponent() {
   //     console.log("Error: ", e);
   //   });
   // };
-
-  useEffect(() => {
-    const getMessages = async () => {
-      invoke("get_chat_messages", {
-        id: chatId,
-      })
-        .then((res) => {
-          setMessages(res as Message[]);
-          console.log("Messages: ", res);
-        })
-        .catch((e) => {
-          console.log("Error: ", e);
-        });
-    };
-    getMessages();
-  }, [chatId]);
 
   return (
     <main className="flex-1 flex flex-col h-[calc(100vh-64px)]">

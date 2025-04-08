@@ -23,19 +23,15 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-
-const conversations = [
-  { id: "1", name: "Project Planning", active: true },
-  { id: "2", name: "Marketing Strategy" },
-  { id: "3", name: "Product Roadmap" },
-  { id: "4", name: "Customer Feedback" },
-];
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import allChatsQueryOptions from "@/features/getAllChatsQuery";
 
 const AppSidebar = () => {
   const [searchQuery, setSearchQuery] = useState("");
-
+  const { data: conversations } = useSuspenseQuery(allChatsQueryOptions());
   const filteredConversations = conversations.filter((conversation) =>
-    conversation.name.toLowerCase().includes(searchQuery.toLowerCase())
+    conversation.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -76,11 +72,18 @@ const AppSidebar = () => {
             <SidebarMenu>
               {filteredConversations.map((conversation) => (
                 <SidebarMenuItem key={conversation.id}>
-                  <SidebarMenuButton asChild isActive={conversation.active}>
-                    <a href="#" className="flex items-center gap-2">
+                  <SidebarMenuButton asChild>
+                    <Link
+                      to="/chats/$chatId"
+                      params={{ chatId: conversation.id }}
+                      className="flex items-center gap-2"
+                      activeProps={{
+                        className: "bg-accent text-accent-foreground",
+                      }}
+                    >
                       <MessageSquare className="h-4 w-4" />
-                      <span>{conversation.name}</span>
-                    </a>
+                      <span>{conversation.title}</span>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

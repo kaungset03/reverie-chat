@@ -17,6 +17,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             commands::ollama::chat_with_history_stream,
+            commands::db::get_all_chats,
             commands::db::create_new_chat,
             commands::db::get_chat_messages,
         ])

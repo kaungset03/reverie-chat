@@ -5,7 +5,7 @@ use uuid::Uuid;
 use crate::AppState;
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
-struct Chat {
+pub struct Chat {
     id: String,
     title: String,
     created_at: String,
@@ -64,6 +64,17 @@ pub async fn create_new_chat(
 }
 
 // get all chats
+#[tauri::command]
+pub async fn get_all_chats(state: tauri::State<'_, AppState>) -> Result<Vec<Chat>, String> {
+    let db = &state.db;
+
+    let chats = sqlx::query_as::<_, Chat>("SELECT * FROM chats")
+        .fetch_all(db)
+        .await
+        .map_err(|e| format!("Get chats error: {}", e))?;
+
+    Ok(chats)
+}
 
 // get all messages for a chat
 #[tauri::command]
