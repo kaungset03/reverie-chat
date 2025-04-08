@@ -18,6 +18,7 @@ function PostComponent() {
   const { data: messages } = useSuspenseQuery(
     messagesByChatIdQueryOptions(chatId)
   );
+  const queryClient = Route.useRouteContext().queryClient;
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const hasStreamRef = useRef(false);
@@ -43,12 +44,14 @@ function PostComponent() {
       };
 
       invoke("chat_generation_stream", {
-        message: messages[0].content,
+        content: messages[0].content,
+        chat_id: chatId,
         stream: onEvent,
       })
         .then(() => {
           // invalidate query and clear streaming
-          console.log("Stream finished");
+          queryClient.invalidateQueries(messagesByChatIdQueryOptions(chatId));
+          setStreaming("");
         })
         .catch((e) => {
           console.log("Error: ", e);

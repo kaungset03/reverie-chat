@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use sqlx::{prelude::FromRow, types::chrono::Utc};
+use sqlx::{prelude::FromRow, types::chrono::Utc, Pool, Sqlite};
 use uuid::Uuid;
 
 use crate::AppState;
@@ -18,6 +18,19 @@ pub struct Message {
     role: String,
     content: String,
     created_at: String,
+}
+
+pub async fn add_new_message(db: &Pool<Sqlite>, chat_id: String, content: String, role: String) {
+    let _ = sqlx::query(
+        "INSERT INTO messages (chat_id, role, content, created_at) VALUES ($1, $2, $3, $4)",
+    )
+    .bind(chat_id)
+    .bind(role)
+    .bind(content)
+    .bind(Utc::now().to_string())
+    .execute(db)
+    .await
+    .map_err(|e| format!("Insert message error: {}", e));
 }
 
 // create a new chat, new message and return the chat id
