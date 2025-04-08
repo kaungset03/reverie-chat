@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
 use ollama_rs::generation::chat::request::ChatMessageRequest;
-use ollama_rs::generation::chat::{ChatMessage, ChatMessageResponseStream};
+use ollama_rs::generation::chat::{ChatMessage, ChatMessageResponseStream, MessageRole};
 use ollama_rs::generation::completion::request::GenerationRequest;
 use ollama_rs::Ollama;
 use tauri::ipc::Channel;
@@ -9,7 +9,23 @@ use tokio_stream::StreamExt;
 
 use crate::AppState;
 
-use super::db::add_new_message;
+use super::db::{add_new_message, chat_messages_by_chat_id, Message};
+
+impl From<&Message> for ChatMessage {
+    fn from(msg: &Message) -> Self {
+        ChatMessage {
+            role: match msg.role.as_str() {
+                "user" => MessageRole::User,
+                "assistant" => MessageRole::Assistant,
+                "system" => MessageRole::System,
+                _ => MessageRole::User,
+            },
+            content: msg.content.clone(),
+            tool_calls: vec![], // assuming you're not using tools
+            images: None,       // assuming no images for now
+        }
+    }
+}
 
 // complete single chat generation and stream response
 #[tauri::command]
@@ -46,24 +62,40 @@ pub async fn chat_generation_stream(
 // chat wit history and stream response
 #[tauri::command]
 pub async fn chat_with_history_stream(
-    messages: Vec<ChatMessage>,
+    state: tauri::State<'_, AppState>,
+    content: &str,
+    chat: &str,
     stream: Channel<String>,
 ) -> Result<(), String> {
+    // add user prompt to db
+    // get ai response for that prompt and stream it
+    // add ai response to db
     let ollama = Ollama::default();
     let model = "deepseek-r1:1.5b".to_string();
-    let (history, user_message) = messages.split_at(messages.len() - 1);
-    let user_message = user_message[0].clone();
-    let history = Arc::new(Mutex::new(history.to_vec()));
+
+    let user_message = ChatMessage::new(
+        ollama_rs::generation::chat::MessageRole::User,
+        content.to_string(),
+    );
+
+    let db = &state.db;
+    let db_messages = chat_messages_by_chat_id(db, chat.to_string())
+        .await
+        .map_err(|e| e.to_string())?;
+    let history_messages: Vec<ChatMessage> = db_messages.iter().map(ChatMessage::from).collect();
+    let history_messages = Arc::new(Mutex::new(history_messages));
 
     let mut stream_response: ChatMessageResponseStream = ollama
         .send_chat_messages_with_history_stream(
-            history,
+            history_messages,
             ChatMessageRequest::new(model, vec![user_message]),
         )
         .await
         .map_err(|e| e.to_string())?;
 
+    let mut response = String::new();
     while let Some(Ok(res)) = stream_response.next().await {
+        response.push_str(&res.message.content);
         stream
             .send(res.message.content)
             .map_err(|e| e.to_string())?;

@@ -13,12 +13,13 @@ pub struct Chat {
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Message {
-    id: i32,
-    chat_id: String,
-    role: String,
-    content: String,
-    created_at: String,
+    pub id: i32,
+    pub chat_id: String,
+    pub role: String,
+    pub content: String,
+    pub created_at: String,
 }
+
 
 pub async fn add_new_message(db: &Pool<Sqlite>, chat_id: String, content: String, role: String) {
     let _ = sqlx::query(
@@ -31,6 +32,19 @@ pub async fn add_new_message(db: &Pool<Sqlite>, chat_id: String, content: String
     .execute(db)
     .await
     .map_err(|e| format!("Insert message error: {}", e));
+}
+
+pub async fn chat_messages_by_chat_id(
+    db: &Pool<Sqlite>,
+    chat_id: String,
+) -> Result<Vec<Message>, String> {
+    let messages = sqlx::query_as::<_, Message>("SELECT * FROM messages WHERE chat_id = $1")
+        .bind(chat_id)
+        .fetch_all(db)
+        .await
+        .map_err(|e| format!("Get messages error: {}", e))?;
+
+    Ok(messages)
 }
 
 // create a new chat, new message and return the chat id
@@ -97,11 +111,8 @@ pub async fn get_chat_messages(
 ) -> Result<Vec<Message>, String> {
     let db = &state.db;
 
-    let messages = sqlx::query_as::<_, Message>("SELECT * FROM messages WHERE chat_id = $1")
-        .bind(id)
-        .fetch_all(db)
+    let messages = chat_messages_by_chat_id(db, id)
         .await
-        .map_err(|e| format!("Get messages error: {}", e))?;
-
+        .map_err(|e| e.to_string())?;
     Ok(messages)
 }
