@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import allChatsQueryOptions from "@/features/getAllChatsQuery";
+import allChatsQueryOptions from "@/features/allChatsQuery";
 
 const AppSidebar = () => {
   const [searchQuery, setSearchQuery] = useState("");

@@ -5,7 +5,7 @@ import { invoke } from "@tauri-apps/api/core";
 
 const messagesByChatIdQueryOptions = (chatId: string) =>
   queryOptions({
-    queryKey: ["messages", { chatId }],
+    queryKey: ["getChatMessages", { chatId }],
     queryFn: async () => {
       const messages = await invoke("get_chat_messages", { id: chatId }).then(
         (res) => res

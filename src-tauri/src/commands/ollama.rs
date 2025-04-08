@@ -2,46 +2,32 @@ use std::sync::{Arc, Mutex};
 
 use ollama_rs::generation::chat::request::ChatMessageRequest;
 use ollama_rs::generation::chat::{ChatMessage, ChatMessageResponseStream};
+use ollama_rs::generation::completion::request::GenerationRequest;
 use ollama_rs::Ollama;
 use tauri::ipc::Channel;
 use tokio_stream::StreamExt;
 
-// #[tauri::command]
-// pub async fn get_complete_response(message: &str) -> Result<String, ()> {
-//     let ollama = Ollama::default();
-//     let model = "deepseek-r1:1.5b".to_string();
-//     let prompt = message.to_string();
+// complete single chat generation and stream response
+#[tauri::command]
+pub async fn chat_generation_stream(message: &str, stream: Channel<String>) -> Result<(), String> {
+    let ollama = Ollama::default();
+    let model = "deepseek-r1:1.5b".to_string();
 
-//     let res = ollama.generate(GenerationRequest::new(model, prompt)).await;
+    let mut stream_response = ollama
+        .generate_stream(GenerationRequest::new(model, message.to_string()))
+        .await
+        .map_err(|e| (e.to_string()))?;
 
-//     if let Ok(res) = res {
-//         Ok(format!("{}", res.response))
-//     } else {
-//         Err(())
-//     }
-// }
+    while let Some(Ok(res)) = stream_response.next().await {
+        for r in res {
+            stream.send(r.response).map_err(|e| e.to_string())?;
+        }
+    }
 
-// #[tauri::command]
-// pub async fn chat_with_history(current: &str, mut history: Vec<ChatMessage>) -> Result<String, ()> {
-//     let mut ollama = Ollama::default();
-//     let model = "deepseek-r1:1.5b".to_string();
+    Ok(())
+}
 
-//     let user_message = ChatMessage::user(current.to_string());
-
-//     let result = ollama
-//         .send_chat_messages_with_history(
-//             &mut history,
-//             ChatMessageRequest::new(model, vec![user_message]),
-//         )
-//         .await;
-
-//     if let Ok(res) = result {
-//         Ok(format!("{}", res.message.content))
-//     } else {
-//         Err(())
-//     }
-// }
-
+// chat wit history and stream response
 #[tauri::command]
 pub async fn chat_with_history_stream(
     messages: Vec<ChatMessage>,

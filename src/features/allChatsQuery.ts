@@ -3,7 +3,7 @@ import { invoke } from "@tauri-apps/api/core";
 
 const allChatsQueryOptions = () =>
   queryOptions({
-    queryKey: ["allChats"],
+    queryKey: ["getAllChats"],
     queryFn: async () => {
       const chats = await invoke("get_all_chats").then((res) => res);
       return chats as Chat[];
