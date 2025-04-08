@@ -45,7 +45,7 @@ function PostComponent() {
 
       invoke("chat_generation_stream", {
         content: messages[0].content,
-        chat_id: chatId,
+        chat: chatId,
         stream: onEvent,
       })
         .then(() => {

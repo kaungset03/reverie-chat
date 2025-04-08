@@ -16,7 +16,7 @@ use super::db::add_new_message;
 pub async fn chat_generation_stream(
     state: tauri::State<'_, AppState>,
     content: &str,
-    chat_id: &str,
+    chat: &str,
     stream: Channel<String>,
 ) -> Result<(), String> {
     let ollama = Ollama::default();
@@ -38,7 +38,7 @@ pub async fn chat_generation_stream(
 
     // add message to db
     let db = &state.db;
-    add_new_message(db, chat_id.to_string(), message, "assistant".to_string()).await;
+    add_new_message(db, chat.to_string(), message, "assistant".to_string()).await;
 
     Ok(())
 }
