@@ -1,23 +1,19 @@
+import { Channel, invoke } from "@tauri-apps/api/core";
 import { createFileRoute } from "@tanstack/react-router";
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import InputForm from "@/components/InputForm";
 import ChatResponse from "@/components/ChatResponse";
-import messagesByChatIdQueryOptions from "@/features/allMessagesQuery";
-import { Channel, invoke } from "@tauri-apps/api/core";
+import useGetMessagesByChatQuery, {
+  messagesByChatQueryOptions,
+} from "@/features/queries/useGetMessagesByChatQuery";
 
 export const Route = createFileRoute("/chats/$chatId")({
   component: PostComponent,
-  loader: ({ context: { queryClient }, params: { chatId } }) =>
-    queryClient.ensureQueryData(messagesByChatIdQueryOptions(chatId)),
-  pendingComponent: () => <p>Loading..</p>,
 });
 
 function PostComponent() {
   const { chatId } = Route.useParams();
-  const { data: messages } = useSuspenseQuery(
-    messagesByChatIdQueryOptions(chatId)
-  );
+  const { data: messages } = useGetMessagesByChatQuery(chatId);
   const queryClient = Route.useRouteContext().queryClient;
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -39,7 +35,7 @@ function PostComponent() {
       setStreaming((prev) => prev + message);
     };
 
-    const userPrompt = input
+    const userPrompt = input;
     setCurrentPrompt(userPrompt);
     setInput("");
 
@@ -50,7 +46,7 @@ function PostComponent() {
     })
       .then(() => {
         // invalidate query and clear streaming
-        queryClient.invalidateQueries(messagesByChatIdQueryOptions(chatId));
+        queryClient.invalidateQueries(messagesByChatQueryOptions(chatId));
         setCurrentPrompt("");
         setStreaming("");
       })
@@ -68,13 +64,13 @@ function PostComponent() {
       };
 
       invoke("chat_generation_stream", {
-        content: messages[0].content,
+        content: messages ? messages[messages.length - 1].content : "",
         chat: chatId,
         stream: onEvent,
       })
         .then(() => {
           // invalidate query and clear streaming
-          queryClient.invalidateQueries(messagesByChatIdQueryOptions(chatId));
+          queryClient.invalidateQueries(messagesByChatQueryOptions(chatId));
           setStreaming("");
         })
         .catch((e) => {
@@ -82,7 +78,7 @@ function PostComponent() {
         });
     };
 
-    if (messages.length <= 1 && !hasStreamRef.current) {
+    if (messages && messages.length <= 1 && !hasStreamRef.current) {
       hasStreamRef.current = true;
       handleStream();
     }
@@ -100,7 +96,7 @@ function PostComponent() {
           className="w-full h-full max-h-full overflow-y-auto scrollbar-thin scrollbar-track-background scrollbar-thumb-foreground"
         >
           <div className="w-lg lg:w-3xl mx-auto flex flex-col gap-y-6 p-3">
-            {messages.map((message) =>
+            {messages?.map((message) =>
               message.role === "user" ? (
                 <div key={message.id} className="flex justify-end">
                   <div className="bg-secondary text-secondary-foreground px-4 py-2 rounded-lg max-w-xs">

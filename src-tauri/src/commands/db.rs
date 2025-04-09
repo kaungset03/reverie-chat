@@ -20,7 +20,6 @@ pub struct Message {
     pub created_at: String,
 }
 
-
 pub async fn add_new_message(db: &Pool<Sqlite>, chat_id: String, content: String, role: String) {
     let _ = sqlx::query(
         "INSERT INTO messages (chat_id, role, content, created_at) VALUES ($1, $2, $3, $4)",
@@ -101,6 +100,34 @@ pub async fn get_all_chats(state: tauri::State<'_, AppState>) -> Result<Vec<Chat
         .map_err(|e| format!("Get chats error: {}", e))?;
 
     Ok(chats)
+}
+
+// delete a chat by id
+#[tauri::command]
+pub async fn delete_chat_by_id(
+    state: tauri::State<'_, AppState>,
+    id: String,
+) -> Result<(), String> {
+    let db = &state.db;
+    sqlx::query("DELETE FROM chats WHERE id = $1")
+        .bind(id)
+        .execute(db)
+        .await
+        .map_err(|e| format!("Delete chat error: {}", e))?;
+
+    Ok(())
+}
+
+// delete all chats
+#[tauri::command]
+pub async fn delete_all_chats(state: tauri::State<'_, AppState>) -> Result<(), String> {
+    let db = &state.db;
+    sqlx::query("DELETE FROM chats")
+        .execute(db)
+        .await
+        .map_err(|e| format!("Delete chat error: {}", e))?;
+
+    Ok(())
 }
 
 // get all messages for a chat

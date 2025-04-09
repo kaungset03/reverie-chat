@@ -20,6 +20,8 @@ pub fn run() {
             commands::ollama::chat_with_history_stream,
             commands::db::get_all_chats,
             commands::db::create_new_chat,
+            commands::db::delete_chat_by_id,
+            commands::db::delete_all_chats,
             commands::db::get_chat_messages,
         ])
         .setup(|app| {

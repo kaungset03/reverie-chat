@@ -10,44 +10,22 @@ import {
 } from "./ui/select";
 import { Button } from "./ui/button";
 import { Send } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
-import { invoke } from "@tauri-apps/api/core";
+import useCreateNewChatMutation from "@/features/mutations/useCreateNewChatMutation";
 
 const Welcome = () => {
-  const navigate = useNavigate();
   const AI_MODELS = [
     { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo" },
     { id: "gpt-4", name: "GPT-4" },
     { id: "gpt-4-turbo", name: "GPT-4 Turbo" },
   ];
+  const { mutate, isPending } = useCreateNewChatMutation()
   const [input, setInput] = useState("");
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (input.trim() === "") return;
-    invoke("create_new_chat", {
-      message: input,
-    })
-      .then((res) => {
-        console.log(res);
-        // navigate({ to: "/chats/$chatId", params: { chatId: "abc123" } });
-        // Handle the response from the backend
-        // console.log("Response:", res as string);
-        navigate({ to: "/chats/$chatId", params: { chatId: res as string } });
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-    // invoke("get_complete_response", { message: input })
-    //   .then((response) => {
-    //     // Handle the response from the backend
-    //     console.log("Response:", response as string);
-    //     //navigate({ to: "/chats/$chatId", params: { chatId: "abc123" } });
-    //   })
-    //   .catch((_) => {
-    //     // Handle any errors
-    //     console.error("An unexpected error occurred");
-    //   });
+    // Call the mutation function with the input value
+    mutate(input);
   };
 
   return (
@@ -82,7 +60,7 @@ const Welcome = () => {
                 ))}
               </SelectContent>
             </Select>
-            <Button type="submit" className="px-4">
+            <Button type="submit" className="px-4" disabled={isPending}>
               <Send className="h-4 w-4 mr-2" />
               Send
             </Button>

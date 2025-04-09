@@ -5,6 +5,7 @@ import {
   Users,
   PlusCircle,
   Search,
+  Trash,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -23,16 +24,22 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import allChatsQueryOptions from "@/features/allChatsQuery";
+import useGetAllChatsQuery from "@/features/queries/useGetAllChatsQuery";
+import useDeleteAllChatsMutation from "@/features/mutations/useDeleteAllChatsMutation";
 
 const AppSidebar = () => {
+  const { mutate, isPending } = useDeleteAllChatsMutation();
+
+  const { data: conversations } = useGetAllChatsQuery();
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: conversations } = useSuspenseQuery(allChatsQueryOptions());
-  const filteredConversations = conversations.filter((conversation) =>
+  const filteredConversations = conversations?.filter((conversation) =>
     conversation.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleDeleteAllChats = () => {
+    mutate();
+  };
 
   return (
     <Sidebar>
@@ -72,7 +79,7 @@ const AppSidebar = () => {
           <SidebarGroupLabel>Recent Conversations</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {filteredConversations.map((conversation) => (
+              {filteredConversations?.map((conversation) => (
                 <SidebarMenuItem key={conversation.id}>
                   <SidebarMenuButton asChild>
                     <Link
@@ -95,6 +102,18 @@ const AppSidebar = () => {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <Button
+                className="flex items-center gap-2"
+                onClick={handleDeleteAllChats}
+                disabled={isPending}
+              >
+                <Trash className="h-4 w-4 text-destructive" />
+                <span>Delete All Chats</span>
+              </Button>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <a href="#" className="flex items-center gap-2">
