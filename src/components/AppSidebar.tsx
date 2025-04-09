@@ -1,14 +1,5 @@
-import { useState } from "react";
-import {
-  MessageSquare,
-  Settings,
-  Users,
-  PlusCircle,
-  Search,
-  Trash,
-} from "lucide-react";
+import { MessageSquare, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import {
   Sidebar,
   SidebarContent,
@@ -17,29 +8,19 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
-  SidebarInput,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+
 import { Link } from "@tanstack/react-router";
 import useGetAllChatsQuery from "@/features/queries/useGetAllChatsQuery";
-import useDeleteAllChatsMutation from "@/features/mutations/useDeleteAllChatsMutation";
+import SettingDialog from "./SettingDialog";
 
 const AppSidebar = () => {
-  const { mutate, isPending } = useDeleteAllChatsMutation();
-
   const { data: conversations } = useGetAllChatsQuery();
-  const [searchQuery, setSearchQuery] = useState("");
-  const filteredConversations = conversations?.filter((conversation) =>
-    conversation.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const handleDeleteAllChats = () => {
-    mutate();
-  };
 
   return (
     <Sidebar>
@@ -56,30 +37,13 @@ const AppSidebar = () => {
             </Button>
           </Link>
         </div>
-        <form className="px-2 pb-2">
-          <SidebarGroup className="py-0">
-            <SidebarGroupContent className="relative">
-              <Label htmlFor="search" className="sr-only">
-                Search conversations
-              </Label>
-              <SidebarInput
-                id="search"
-                placeholder="Search conversations..."
-                className="pl-8"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <Search className="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 select-none opacity-50" />
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </form>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Recent Conversations</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {filteredConversations?.map((conversation) => (
+              {conversations?.map((conversation) => (
                 <SidebarMenuItem key={conversation.id}>
                   <SidebarMenuButton asChild>
                     <Link
@@ -103,32 +67,7 @@ const AppSidebar = () => {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Button
-                className="flex items-center gap-2"
-                onClick={handleDeleteAllChats}
-                disabled={isPending}
-              >
-                <Trash className="h-4 w-4 text-destructive" />
-                <span>Delete All Chats</span>
-              </Button>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <a href="#" className="flex items-center gap-2">
-                <Settings className="h-4 w-4" />
-                <span>Settings</span>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <a href="#" className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                <span>Team Access</span>
-              </a>
-            </SidebarMenuButton>
+            <SettingDialog />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

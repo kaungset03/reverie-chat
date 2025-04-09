@@ -42,8 +42,8 @@ const Welcome = () => {
           className="w-2/3 max-w-lg flex flex-col gap-2"
         >
           <Textarea
-            placeholder="Type your message..."
-            className="min-h-[72px] max-h-[200px] resize-none bg-muted/30 border-2 rounded-xl text-base scrollbar-thin scrollbar-track-background scrollbar-thumb-foreground"
+            placeholder="Type your message"
+            className="min-h-[72px] max-h-[200px] resize-none bg-muted/30 border-2 border-primary rounded-2xl text-base scrollbar-thin scrollbar-track-background scrollbar-thumb-foreground"
             value={input}
             onChange={(e) => setInput(e.target.value)}
           />
