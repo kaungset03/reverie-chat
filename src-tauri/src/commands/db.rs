@@ -94,7 +94,7 @@ pub async fn create_new_chat(
 pub async fn get_all_chats(state: tauri::State<'_, AppState>) -> Result<Vec<Chat>, String> {
     let db = &state.db;
 
-    let chats = sqlx::query_as::<_, Chat>("SELECT * FROM chats")
+    let chats = sqlx::query_as::<_, Chat>("SELECT * FROM chats ORDER BY created_at DESC")
         .fetch_all(db)
         .await
         .map_err(|e| format!("Get chats error: {}", e))?;
