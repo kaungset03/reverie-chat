@@ -67,24 +67,33 @@ pub async fn chat_with_history_stream(
     chat: &str,
     stream: Channel<String>,
 ) -> Result<(), String> {
-    // add user prompt to db
-    // get ai response for that prompt and stream it
-    // add ai response to db
     let ollama = Ollama::default();
     let model = "deepseek-r1:1.5b".to_string();
 
-    let user_message = ChatMessage::new(
-        ollama_rs::generation::chat::MessageRole::User,
-        content.to_string(),
-    );
-
     let db = &state.db;
+
+    // get history messages from db
     let db_messages = chat_messages_by_chat_id(db, chat.to_string())
         .await
         .map_err(|e| e.to_string())?;
     let history_messages: Vec<ChatMessage> = db_messages.iter().map(ChatMessage::from).collect();
     let history_messages = Arc::new(Mutex::new(history_messages));
 
+    // add current user prompt to db
+    add_new_message(
+        db,
+        chat.to_string(),
+        content.to_string(),
+        "user".to_string(),
+    )
+    .await;
+
+    // get ollama response
+    // stream response
+    let user_message = ChatMessage::new(
+        ollama_rs::generation::chat::MessageRole::User,
+        content.to_string(),
+    );
     let mut stream_response: ChatMessageResponseStream = ollama
         .send_chat_messages_with_history_stream(
             history_messages,
@@ -100,6 +109,9 @@ pub async fn chat_with_history_stream(
             .send(res.message.content)
             .map_err(|e| e.to_string())?;
     }
+
+    // add new response to db
+    add_new_message(db, chat.to_string(), response, "assistant".to_string()).await;
 
     Ok(())
 }

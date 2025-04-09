@@ -42,10 +42,12 @@ const AppSidebar = () => {
           <SidebarTrigger />
         </div>
         <div className="px-2 pb-2">
-          <Button className="w-full justify-start gap-2" variant="outline">
-            <PlusCircle className="h-4 w-4" />
-            New Chat
-          </Button>
+          <Link to="/">
+            <Button className="w-full justify-start gap-2" variant="outline">
+              <PlusCircle className="h-4 w-4" />
+              New Chat
+            </Button>
+          </Link>
         </div>
         <form className="px-2 pb-2">
           <SidebarGroup className="py-0">

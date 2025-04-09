@@ -24,6 +24,7 @@ function PostComponent() {
   const hasStreamRef = useRef(false);
 
   const [input, setInput] = useState<string>("");
+  const [currentPrompt, setCurrentPrompt] = useState<string>("");
   const [streaming, setStreaming] = useState<string>("");
 
   const handleInputChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -32,7 +33,30 @@ function PostComponent() {
 
   const handleInputSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("submit");
+    // invoke rust command
+    const onEvent = new Channel<string>();
+    onEvent.onmessage = (message) => {
+      setStreaming((prev) => prev + message);
+    };
+
+    const userPrompt = input
+    setCurrentPrompt(userPrompt);
+    setInput("");
+
+    invoke("chat_with_history_stream", {
+      content: userPrompt,
+      chat: chatId,
+      stream: onEvent,
+    })
+      .then(() => {
+        // invalidate query and clear streaming
+        queryClient.invalidateQueries(messagesByChatIdQueryOptions(chatId));
+        setCurrentPrompt("");
+        setStreaming("");
+      })
+      .catch((e) => {
+        console.log("Error: ", e);
+      });
   };
 
   useEffect(() => {
@@ -87,6 +111,13 @@ function PostComponent() {
                 <ChatResponse key={message.id} message={message.content} />
               )
             )}
+            {currentPrompt !== "" && (
+              <div className="flex justify-end">
+                <div className="bg-secondary text-secondary-foreground px-4 py-2 rounded-lg max-w-xs">
+                  {currentPrompt}
+                </div>
+              </div>
+            )}
             {streaming !== "" && <ChatResponse message={streaming} />}
           </div>
         </div>
@@ -101,49 +132,3 @@ function PostComponent() {
     </main>
   );
 }
-
-// const handleInputSubmit = (e: FormEvent<HTMLFormElement>) => {
-//   e.preventDefault();
-//   const newPrompt: Message = { role: "user", content: input };
-//   const updatedMessages = [...messages, newPrompt];
-//   setMessages(updatedMessages);
-//   setInput("");
-
-//   const onEvent = new Channel<string>();
-//   onEvent.onmessage = (message) => {
-//     // add message to the last message of messages
-//     setMessages((prev) => {
-//       const updated = [...prev];
-//       // check if the last message is assistant or not
-//       const lastMessage = updated[updated.length - 1];
-//       if (lastMessage && lastMessage.role === "assistant") {
-//         // append chunk of message to content
-//         updated[updated.length - 1] = {
-//           ...lastMessage,
-//           content: lastMessage.content + message,
-//         };
-//       } else {
-//         // add new message
-//         updated.push({
-//           role: "assistant",
-//           content: message,
-//         });
-//       }
-
-//       return updated;
-//     });
-
-//     if (scrollRef.current) {
-//       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-//     }
-//   };
-
-//   invoke("chat_with_history_stream", {
-//     messages: updatedMessages,
-//     stream: onEvent,
-//   }).then(() => {
-//     console.log("Stream finished");
-//   }).catch((e) => {
-//     console.log("Error: ", e);
-//   });
-// };
