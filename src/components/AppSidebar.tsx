@@ -15,13 +15,18 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import SettingDialog from "@/components/SettingDialog";
 import ChatOptionsDropdown from "@/components/ChatOptionsDropdown";
 import useGetAllChatsQuery from "@/features/queries/useGetAllChatsQuery";
 
 const AppSidebar = () => {
+  const navigate = useNavigate();
   const { data: conversations } = useGetAllChatsQuery();
+
+  const handleNavigate = (chatId: string) => {
+    navigate({ to: "/chats/$chatId", params: { chatId } });
+  };
 
   return (
     <Sidebar>
@@ -51,7 +56,7 @@ const AppSidebar = () => {
                 >
                   <SidebarMenuButton
                     className="hover:bg-transparent"
-                    onClick={() => console.log("Conversation clicked")}
+                    onClick={() => handleNavigate(conversation.id)}
                   >
                     <span>Lorem ipsum dolor sit</span>
                   </SidebarMenuButton>

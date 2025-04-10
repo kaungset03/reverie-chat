@@ -9,7 +9,7 @@ const useDeleteChatByIdMutation = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: async (chatId: string) => {
       try {
-        await invoke("delete_chat_by_id", { chatId });
+        await invoke("delete_chat_by_id", { id: chatId });
       } catch (error) {
         throw new Error(error as string);
       }
