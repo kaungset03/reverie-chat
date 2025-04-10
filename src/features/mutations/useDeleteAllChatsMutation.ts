@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { invoke } from "@tauri-apps/api/core";
-import { allChatsQueryOptions } from "../queries/useGetAllChatsQuery";
+import { allChatsQueryOptions } from "@/features/queries/useGetAllChatsQuery";
 
 const useDeleteAllChatsMutation = () => {
   const navigate = useNavigate();

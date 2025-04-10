@@ -1,4 +1,4 @@
-import { MessageSquare, PlusCircle } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sidebar,
@@ -16,8 +16,9 @@ import {
 } from "@/components/ui/sidebar";
 
 import { Link } from "@tanstack/react-router";
+import SettingDialog from "@/components/SettingDialog";
+import ChatOptionsDropdown from "@/components/ChatOptionsDropdown";
 import useGetAllChatsQuery from "@/features/queries/useGetAllChatsQuery";
-import SettingDialog from "./SettingDialog";
 
 const AppSidebar = () => {
   const { data: conversations } = useGetAllChatsQuery();
@@ -44,20 +45,17 @@ const AppSidebar = () => {
           <SidebarGroupContent>
             <SidebarMenu>
               {conversations?.map((conversation) => (
-                <SidebarMenuItem key={conversation.id}>
-                  <SidebarMenuButton asChild>
-                    <Link
-                      to="/chats/$chatId"
-                      params={{ chatId: conversation.id }}
-                      className="flex items-center gap-2"
-                      activeProps={{
-                        className: "bg-accent text-accent-foreground",
-                      }}
-                    >
-                      <MessageSquare className="h-4 w-4" />
-                      <span>{conversation.title}</span>
-                    </Link>
+                <SidebarMenuItem
+                  key={conversation.id}
+                  className="flex items-center justify-between hover:bg-accent hover:text-accent-foreground rounded-lg duration-300 ease-in-out group/menu"
+                >
+                  <SidebarMenuButton
+                    className="hover:bg-transparent"
+                    onClick={() => console.log("Conversation clicked")}
+                  >
+                    <span>Lorem ipsum dolor sit</span>
                   </SidebarMenuButton>
+                  <ChatOptionsDropdown chat={conversation} />
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>

@@ -13,15 +13,24 @@ import { Button } from "@/components/ui/button";
 type AlertDialogProps = {
   title: string;
   onConfirm: () => void;
+  children?: React.ReactNode;
 };
 
-const DeleteAlertDialog = ({ title, onConfirm }: AlertDialogProps) => {
+const DeleteAlertDialog = ({
+  title,
+  onConfirm,
+  children,
+}: AlertDialogProps) => {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive" className="rounded-full">
-          Delete all
-        </Button>
+        {children ? (
+          children
+        ) : (
+          <Button variant="destructive" className="rounded-full">
+            Delete all
+          </Button>
+        )}
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
