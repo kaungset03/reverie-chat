@@ -1,22 +1,22 @@
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import AppSidebar from "@/components/AppSidebar";
 import Header from "@/components/Header";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import AppSidebar from "@/components/AppSidebar";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { type QueryClient } from "@tanstack/react-query";
 
 const Root = () => {
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <SidebarProvider>
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+      <div className="flex h-screen">
         <AppSidebar />
-        <SidebarInset className="bg-background w-full h-screen overflow-hidden">
+        <main className="bg-background flex-1 flex flex-col overflow-hidden">
           <Header />
           <Outlet />
-        </SidebarInset>
-        <TanStackRouterDevtools position="bottom-right" />
-      </SidebarProvider>
+        </main>
+      </div>
+
+      <TanStackRouterDevtools position="bottom-right" />
     </ThemeProvider>
   );
 };
