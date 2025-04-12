@@ -11,14 +11,16 @@ const useDeleteChatByIdMutation = () => {
     mutationFn: async (chatId: string) => {
       try {
         await invoke("delete_chat_by_id", { id: chatId });
+        return chatId;
       } catch (error) {
         throw new Error(error as string);
       }
     },
-    onSuccess: () => {
+    onSuccess: (chatId) => {
       queryClient.invalidateQueries(allChatsQueryOptions());
       // TODO: if the deleted chat was the current path, navigate to the home page
-      if (router.location.pathname === "/chats/$chatId") {
+      console.log(router.location.pathname);
+      if (router.location.pathname === `/chats/${chatId}`) {
         navigate({ to: "/" });
       }
     },

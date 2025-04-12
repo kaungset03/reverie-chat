@@ -6,8 +6,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { SidebarMenuButton } from "@/components/ui/sidebar";
-import { ChevronRight, Settings } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -20,7 +19,11 @@ import { Label } from "@/components/ui/label";
 import DeleteAlertDialog from "@/components/DeleteAlertDialog";
 import useDeleteAllChatsMutation from "@/features/mutations/useDeleteAllChatsMutation";
 
-const SettingDialog = () => {
+type SettingDialogProps = {
+  children: React.ReactNode;
+};
+
+const SettingDialog = ({ children }: SettingDialogProps) => {
   const themes = ["Light", "Dark", "System"];
   const { setTheme, theme } = useTheme();
   const { mutate: deleteAllChats } = useDeleteAllChatsMutation();
@@ -31,15 +34,7 @@ const SettingDialog = () => {
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <SidebarMenuButton
-          className="flex items-center gap-4 cursor-pointer p-5"
-          variant="default"
-        >
-          <Settings className="h-4 w-4" />
-          <span>Settings</span>
-        </SidebarMenuButton>
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
           <DialogTitle>Settings</DialogTitle>
