@@ -29,7 +29,7 @@ impl From<&Message> for ChatMessage {
 }
 
 fn remove_think_tags(text: &str) -> String {
-    let re = Regex::new(r"<think>(.*?)</think>").unwrap();
+    let re = Regex::new(r"(?s)<think>.*?</think>").unwrap();
     let result = re.replace_all(text, "").to_string();
     result
 }
@@ -47,8 +47,9 @@ pub async fn generate_title(message: &str) -> String {
         .generate(GenerationRequest::new(model, title_prompt))
         .await;
     if let Ok(res) = response {
-        remove_think_tags(&res.response)
-    } else {
+        let title = remove_think_tags(&res.response);
+        title
+    }else {
         "New Chat".to_string()
     }
 }
