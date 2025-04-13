@@ -3387,6 +3387,7 @@ name = "reverie-chat"
 version = "0.1.0"
 dependencies = [
  "ollama-rs",
+ "regex",
  "serde",
  "serde_json",
  "sqlx",

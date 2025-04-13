@@ -4,6 +4,8 @@ use uuid::Uuid;
 
 use crate::AppState;
 
+use super::ollama::generate_title;
+
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Chat {
     id: String,
@@ -55,6 +57,9 @@ pub async fn create_new_chat(
     let db = &state.db;
     let chat_id = Uuid::new_v4();
 
+    let chat_title = generate_title(message).await;
+
+    // Create a new chat and message in a transaction
     let mut transaction = db
         .begin()
         .await
@@ -64,7 +69,7 @@ pub async fn create_new_chat(
         "INSERT INTO chats (id, title, created_at) VALUES ($1, $2, $3) RETURNING id",
     )
     .bind(chat_id.to_string())
-    .bind("New Chat")
+    .bind(chat_title)
     .bind(Utc::now().to_string())
     .fetch_one(&mut *transaction)
     .await

@@ -4,6 +4,7 @@ use ollama_rs::generation::chat::request::ChatMessageRequest;
 use ollama_rs::generation::chat::{ChatMessage, ChatMessageResponseStream, MessageRole};
 use ollama_rs::generation::completion::request::GenerationRequest;
 use ollama_rs::Ollama;
+use regex::Regex;
 use tauri::ipc::Channel;
 use tokio_stream::StreamExt;
 
@@ -24,6 +25,31 @@ impl From<&Message> for ChatMessage {
             tool_calls: vec![], // assuming you're not using tools
             images: None,       // assuming no images for now
         }
+    }
+}
+
+fn remove_think_tags(text: &str) -> String {
+    let re = Regex::new(r"<think>(.*?)</think>").unwrap();
+    let result = re.replace_all(text, "").to_string();
+    result
+}
+
+// create a title for chat based on the first message
+pub async fn generate_title(message: &str) -> String {
+    let ollama = Ollama::default();
+    let model = "deepseek-r1:1.5b".to_string();
+    let title_prompt = format!(
+        "Generate a short, descriptive title (5-8 words) for the following conversation prompt:\n\"{}\"",
+        message
+    );
+
+    let response = ollama
+        .generate(GenerationRequest::new(model, title_prompt))
+        .await;
+    if let Ok(res) = response {
+        remove_think_tags(&res.response)
+    } else {
+        "New Chat".to_string()
     }
 }
 
