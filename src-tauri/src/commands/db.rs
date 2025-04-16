@@ -22,7 +22,7 @@ pub struct Message {
     pub created_at: String,
 }
 
-pub async fn add_new_message(db: &Pool<Sqlite>, chat_id: String, content: String, role: String) {
+pub async fn add_new_message(db: &Pool<Sqlite>, chat_id: &str, content: &str, role: String) {
     let _ = sqlx::query(
         "INSERT INTO messages (chat_id, role, content, created_at) VALUES ($1, $2, $3, $4)",
     )
@@ -37,7 +37,7 @@ pub async fn add_new_message(db: &Pool<Sqlite>, chat_id: String, content: String
 
 pub async fn chat_messages_by_chat_id(
     db: &Pool<Sqlite>,
-    chat_id: String,
+    chat_id: &str,
 ) -> Result<Vec<Message>, String> {
     let messages = sqlx::query_as::<_, Message>("SELECT * FROM messages WHERE chat_id = $1")
         .bind(chat_id)
@@ -143,7 +143,7 @@ pub async fn get_chat_messages(
 ) -> Result<Vec<Message>, String> {
     let db = &state.db;
 
-    let messages = chat_messages_by_chat_id(db, id)
+    let messages = chat_messages_by_chat_id(db, &id)
         .await
         .map_err(|e| e.to_string())?;
     Ok(messages)

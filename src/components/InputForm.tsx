@@ -1,14 +1,14 @@
-import { Textarea } from "@/components/ui/textarea";
+import useGetListOfModelsQuery from "@/features/queries/useGetListOfModelsQuery";
+import { Textarea } from "./ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Send } from "lucide-react";
-import useGetListOfModelsQuery from "@/features/queries/useGetListOfModelsQuery";
+} from "./ui/select";
+import { SendHorizonal } from "lucide-react";
+import { Button } from "./ui/button";
 
 type InputFormProps = {
   value: string;
@@ -21,34 +21,63 @@ const InputForm = ({
   handleOnChange,
   handleOnSubmit,
 }: InputFormProps) => {
-  const { data: models } = useGetListOfModelsQuery();
+  // const { data: models } = useGetListOfModelsQuery();
+  const models: LocalModel[] = [
+    {
+      name: "gpt-3.5-turbo",
+      modified_at: "2023-10-01T00:00:00Z",
+      size: 0,
+    },
+    {
+      name: "gpt-4",
+      modified_at: "2023-10-01T00:00:00Z",
+      size: 0,
+    },
+    {
+      name: "gpt-4-32k",
+      modified_at: "2023-10-01T00:00:00Z",
+      size: 0,
+    },
+    {
+      name: "gpt-4-turbo",
+      modified_at: "2023-10-01T00:00:00Z",
+      size: 0,
+    },
+    {
+      name: "gpt-4-turbo-16k",
+      modified_at: "2023-10-01T00:00:00Z",
+      size: 0,
+    },
+  ];
   return (
     <form
-      className="w-lg lg:w-3xl mx-auto flex flex-col gap-2"
+      className="w-lg lg:w-3xl mx-auto flex flex-col gap-2 p-3 rounded-3xl bg-input dark:bg-input/30 shadow-md shadow-background/20 backdrop-blur-md"
       onSubmit={handleOnSubmit}
     >
       <Textarea
         placeholder="Type your message..."
-        className="min-h-[80px] max-h-[180px] px-4 resize-none border-2 rounded-lg text-base scrollbar-thin scrollbar-track-background scrollbar-thumb-foreground"
+        className="min-h-[80px] max-h-[180px] placeholder:text-base resize-none shadow-none border-none rounded-lg scrollbar-thin scrollbar-track-background scrollbar-thumb-foreground"
         value={value}
         onChange={handleOnChange}
       />
       <div className="flex items-center justify-between">
         <Select>
-          <SelectTrigger className="w-[180px] bg-muted/30 border-2 focus:ring-violet-500 focus:border-violet-500">
+          <SelectTrigger className="min-w-44 rounded-3xl border-primary">
             <SelectValue placeholder="Select model" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded-3xl">
             {models?.map((model) => (
-              <SelectItem key={model.name} value={model.name}>
+              <SelectItem className="rounded-2xl h-10" key={model.name} value={model.name}>
                 {model.name}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Button type="submit" className="px-4">
-          <Send className="h-4 w-4 mr-2" />
-          Send
+        <Button
+          type="submit"
+          className="size-10 flex justify-center items-center rounded-full"
+        >
+          <SendHorizonal />
         </Button>
       </div>
     </form>

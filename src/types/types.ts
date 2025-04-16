@@ -20,6 +20,14 @@ declare global {
     modified_at: string;
     size: number;
   }
+
+
+  // prompt
+  interface Prompt {
+    content: string;
+    chat_id: string;
+    model: string;
+  }
 }
 
 export {};
