@@ -1,25 +1,14 @@
 import { useState } from "react";
-//import { invoke } from "@tauri-apps/api/core";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
-import { Button } from "./ui/button";
-import { Send } from "lucide-react";
+import InputForm from "@/components/InputForm";
 import useCreateNewChatMutation from "@/features/mutations/useCreateNewChatMutation";
 
 const Welcome = () => {
-  const AI_MODELS = [
-    { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo" },
-    { id: "gpt-4", name: "GPT-4" },
-    { id: "gpt-4-turbo", name: "GPT-4 Turbo" },
-  ];
-  const { mutate, isPending } = useCreateNewChatMutation()
+  const { mutate } = useCreateNewChatMutation();
   const [input, setInput] = useState("");
+
+  const handleOnChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+  };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -37,7 +26,7 @@ const Welcome = () => {
             Start a conversation by typing a message below.
           </p>
         </div>
-        <form
+        {/* <form
           onSubmit={handleSubmit}
           className="w-2/3 max-w-lg flex flex-col gap-2"
         >
@@ -65,7 +54,12 @@ const Welcome = () => {
               Send
             </Button>
           </div>
-        </form>
+        </form> */}
+        <InputForm
+          value={input}
+          handleOnChange={handleOnChange}
+          handleOnSubmit={handleSubmit}
+        />
       </div>
     </main>
   );

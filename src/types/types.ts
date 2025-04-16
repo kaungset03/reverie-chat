@@ -14,6 +14,12 @@ declare global {
     title: string;
     created_at: string;
   }
+
+  interface LocalModel {
+    name: string;
+    modified_at: string;
+    size: number;
+  }
 }
 
 export {};

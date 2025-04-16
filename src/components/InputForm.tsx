@@ -8,29 +8,30 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
-
+import useGetListOfModelsQuery from "@/features/queries/useGetListOfModelsQuery";
 
 type InputFormProps = {
   value: string;
   handleOnChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   handleOnSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-}
+};
 
-
-const InputForm = ({ value, handleOnChange, handleOnSubmit }: InputFormProps) => {
-  const AI_MODELS = [
-    { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo" },
-    { id: "gpt-4", name: "GPT-4" },
-    { id: "gpt-4-turbo", name: "GPT-4 Turbo" },
-  ];
+const InputForm = ({
+  value,
+  handleOnChange,
+  handleOnSubmit,
+}: InputFormProps) => {
+  const { data: models } = useGetListOfModelsQuery();
   return (
-    <form className="w-lg lg:w-3xl mx-auto flex flex-col gap-2" onSubmit={handleOnSubmit}>
+    <form
+      className="w-lg lg:w-3xl mx-auto flex flex-col gap-2"
+      onSubmit={handleOnSubmit}
+    >
       <Textarea
         placeholder="Type your message..."
         className="min-h-[80px] max-h-[180px] px-4 resize-none border-2 rounded-lg text-base scrollbar-thin scrollbar-track-background scrollbar-thumb-foreground"
         value={value}
         onChange={handleOnChange}
-      
       />
       <div className="flex items-center justify-between">
         <Select>
@@ -38,8 +39,8 @@ const InputForm = ({ value, handleOnChange, handleOnSubmit }: InputFormProps) =>
             <SelectValue placeholder="Select model" />
           </SelectTrigger>
           <SelectContent>
-            {AI_MODELS.map((model) => (
-              <SelectItem key={model.id} value={model.id}>
+            {models?.map((model) => (
+              <SelectItem key={model.name} value={model.name}>
                 {model.name}
               </SelectItem>
             ))}

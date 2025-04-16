@@ -3,6 +3,7 @@ use std::sync::{Arc, Mutex};
 use ollama_rs::generation::chat::request::ChatMessageRequest;
 use ollama_rs::generation::chat::{ChatMessage, ChatMessageResponseStream, MessageRole};
 use ollama_rs::generation::completion::request::GenerationRequest;
+use ollama_rs::models::LocalModel;
 use ollama_rs::Ollama;
 use regex::Regex;
 use tauri::ipc::Channel;
@@ -49,8 +50,20 @@ pub async fn generate_title(message: &str) -> String {
     if let Ok(res) = response {
         let title = remove_think_tags(&res.response);
         title
-    }else {
+    } else {
         "New Chat".to_string()
+    }
+}
+
+// get a list of all available models
+#[tauri::command]
+pub async fn get_list_of_models() -> Result<Vec<LocalModel>, String> {
+    let ollama = Ollama::default();
+    let res = ollama.list_local_models().await;
+    if let Ok(models) = res {
+        Ok(models)
+    } else {
+        Err("Failed to get models".to_string())
     }
 }
 
