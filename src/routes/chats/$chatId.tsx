@@ -6,6 +6,7 @@ import ChatResponse from "@/components/ChatResponse";
 import useGetMessagesByChatQuery, {
   messagesByChatQueryOptions,
 } from "@/features/queries/useGetMessagesByChatQuery";
+import { useChatOptions } from "@/providers/ChatOptionsProvider";
 
 export const Route = createFileRoute("/chats/$chatId")({
   component: PostComponent,
@@ -15,6 +16,7 @@ function PostComponent() {
   const { chatId } = Route.useParams();
   const { data: messages } = useGetMessagesByChatQuery(chatId);
   const queryClient = Route.useRouteContext().queryClient;
+  const { chatOptions } = useChatOptions();
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const hasStreamRef = useRef(false);
@@ -40,8 +42,11 @@ function PostComponent() {
     setInput("");
 
     invoke("chat_with_history_stream", {
-      content: userPrompt,
-      chat: chatId,
+      prompt: {
+        content: userPrompt,
+        chat_id: chatId,
+        model: chatOptions.model,
+      },
       stream: onEvent,
     })
       .then(() => {
@@ -64,8 +69,11 @@ function PostComponent() {
       };
 
       invoke("chat_generation_stream", {
-        content: messages ? messages[messages.length - 1].content : "",
-        chat: chatId,
+        prompt: {
+          content: messages ? messages[messages.length - 1].content : "",
+          chat_id: chatId,
+          model: chatOptions.model,
+        },
         stream: onEvent,
       })
         .then(() => {
