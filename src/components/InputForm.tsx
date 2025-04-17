@@ -8,7 +8,8 @@ import {
   SelectValue,
 } from "./ui/select";
 import { SendHorizonal } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
+import { useChatOptions } from "@/providers/ChatOptionsProvider";
 
 type InputFormProps = {
   value: string;
@@ -21,34 +22,13 @@ const InputForm = ({
   handleOnChange,
   handleOnSubmit,
 }: InputFormProps) => {
-  // const { data: models } = useGetListOfModelsQuery();
-  const models: LocalModel[] = [
-    {
-      name: "gpt-3.5-turbo",
-      modified_at: "2023-10-01T00:00:00Z",
-      size: 0,
-    },
-    {
-      name: "gpt-4",
-      modified_at: "2023-10-01T00:00:00Z",
-      size: 0,
-    },
-    {
-      name: "gpt-4-32k",
-      modified_at: "2023-10-01T00:00:00Z",
-      size: 0,
-    },
-    {
-      name: "gpt-4-turbo",
-      modified_at: "2023-10-01T00:00:00Z",
-      size: 0,
-    },
-    {
-      name: "gpt-4-turbo-16k",
-      modified_at: "2023-10-01T00:00:00Z",
-      size: 0,
-    },
-  ];
+  const { data: models } = useGetListOfModelsQuery();
+  const { handleChatOptions, chatOptions } = useChatOptions();
+
+  const handleModelChange = (model: string) => {
+    handleChatOptions({ ...chatOptions, model });
+  };
+
   return (
     <form
       className="w-lg lg:w-3xl mx-auto flex flex-col gap-2 p-3 rounded-3xl bg-input dark:bg-input/30 shadow-md shadow-background/20 backdrop-blur-md"
@@ -61,13 +41,17 @@ const InputForm = ({
         onChange={handleOnChange}
       />
       <div className="flex items-center justify-between">
-        <Select>
+        <Select onValueChange={handleModelChange}>
           <SelectTrigger className="min-w-44 rounded-3xl border-primary">
-            <SelectValue placeholder="Select model" />
+            <SelectValue placeholder={chatOptions.model} />
           </SelectTrigger>
           <SelectContent className="rounded-3xl">
             {models?.map((model) => (
-              <SelectItem className="rounded-2xl h-10" key={model.name} value={model.name}>
+              <SelectItem
+                className="rounded-2xl h-10"
+                key={model.name}
+                value={model.name}
+              >
                 {model.name}
               </SelectItem>
             ))}
