@@ -15,7 +15,13 @@ const ChatResponse = ({ message }: ChatResponseProps) => {
     <div className="min-w-full prose prose-strong:text-foreground text-accent-foreground">
       <Markdown
         components={{
-          code({ node, className, children, ...props }) {
+          a: ({ node, ...props }) => (
+            <a
+              {...props}
+              className="underline text-secondary-foreground hover:opacity-75 transition-opacity"
+            />
+          ),
+          code: ({ node, className, children, ...props }) => {
             const match = /language-(\w+)/.exec(className || "");
             // The 'node' prop is not used by SyntaxHighlighter and can cause type issues
             // The 'ref' prop from Markdown might be incompatible, so we don't spread it.
