@@ -36,7 +36,7 @@ const InputForm = ({
     >
       <Textarea
         placeholder="Type your message..."
-        className="min-h-[80px] max-h-[180px] placeholder:text-base resize-none shadow-none border-none rounded-lg scrollbar-thin scrollbar-track-background scrollbar-thumb-foreground"
+        className="min-h-[40px] max-h-[140px] placeholder:text-base resize-none shadow-none border-none rounded-lg scrollbar-thin scrollbar-track-background scrollbar-thumb-foreground"
         value={value}
         onChange={handleOnChange}
       />
