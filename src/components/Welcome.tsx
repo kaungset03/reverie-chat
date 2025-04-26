@@ -3,7 +3,7 @@ import InputForm from "@/components/InputForm";
 import useCreateNewChatMutation from "@/features/mutations/useCreateNewChatMutation";
 
 const Welcome = () => {
-  const { mutate } = useCreateNewChatMutation();
+  const { mutate, isPending } = useCreateNewChatMutation();
   const [input, setInput] = useState("");
 
   const handleOnChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -12,9 +12,9 @@ const Welcome = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (input.trim() === "") return;
+    if (input.trim() === "" || isPending) return;
     // Call the mutation function with the input value
-    mutate(input);
+    mutate(input)
   };
 
   return (
